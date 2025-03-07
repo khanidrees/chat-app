@@ -1,0 +1,21 @@
+{
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "eslint.validate": ["javascript"],
+     /**
+     * @file "settings.json"
+     * @desc "This is what my configuration looks like" */
+
+     "git-autoconfig.configList": [
+        {
+             "user.email": "khanidrees1234@gmail.com",
+             "user.name": "khanidrees"
+         },
+         {
+             "user.email": "idrees@hashtag-ca.com",
+             "user.name": "idrees_hashtag"
+         }
+   ]
+
+}
