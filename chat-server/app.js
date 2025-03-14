@@ -44,7 +44,6 @@ app.use(bodyParser.json());
 
 app.use('/api/v1/users', userRouter);
 
-
 app.use('/', (req, res) => res.json({ hi: 'from server' }));
 
 app.use((err, req, res, next) => {

@@ -5,4 +5,8 @@ export type User = {
     password: string;
     confirmPassword: string;
 };
+export type UserCredentials = {
+    email: string,
+    password: string,
+}
 

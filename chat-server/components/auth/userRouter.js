@@ -5,6 +5,7 @@ const { body, validationResult } = require('express-validator');
 
 const User = require('./userModel');
 const userController = require('./userController');
+const { isAuthorized } = require('./auth');
 
 router.post(
   '/register',
@@ -49,11 +50,18 @@ router.post(
       .withMessage('Please Enter Valid Email')
       .normalizeEmail(),
     body('password', 'Enter 8 char of alphanumeric type onnly')
-      .isLength(8)
+      .isLength({ min: 6, max: 8 })
       .isAlphanumeric()
       .trim(),
   ],
   userController.loginUser
+  ,
+);
+
+router.get(
+  '/',
+  isAuthorized,
+  userController.getUsers
   ,
 );
 

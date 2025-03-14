@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,10 +24,8 @@ const formSchema = z.object({
     message: "Passwords don't match",
     path: ["confirmPassword"], // path of error
   });
-
-import React from 'react'
 import { postUser } from "@/apis";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Signup = () => {
     const navigate = useNavigate(); 
@@ -37,6 +34,7 @@ const Signup = () => {
         defaultValues: {
             fullname:"",
             username: "",
+            email:"",
             password:"",
             confirmPassword:"",
         },
@@ -141,6 +139,7 @@ const Signup = () => {
                 )}
                 />
                 <Button type="submit">Sign Up</Button>
+                <p>Already Signed up ? <NavLink className={'text-blue-700'} to="/login">Log In</NavLink></p>
             </form>
             </Form>
         </div>

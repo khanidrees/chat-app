@@ -41,7 +41,7 @@ const loginUser = async (email, password) => {
       exp: Math.floor(Date.now() / 1000) + (60 * 60 * 8),
       id: user.id,
     }, process.env.JWT_PRIVATE_KEY);
-    console.log('token', token);
+    // console.log('token', token);
     const resposne = new ApiResponse(
       201,
       {
@@ -55,7 +55,14 @@ const loginUser = async (email, password) => {
   throw new ApiError(402, 'Incorrect email or password');
 };
 
+const getUsers = async (query) => {
+  if (query === '') return [];
+  const users = await User.find({ $text: { $search: query } });
+
+  return new ApiResponse(200, users, 'Users Retrieved');
+};
 module.exports = {
   postUser,
   loginUser,
+  getUsers,
 };
