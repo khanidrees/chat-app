@@ -32,14 +32,14 @@ const postUser = async (username, fullname, email, mobileNumber, password) => {
 
 const loginUser = async (email, password) => {
   const user = await User.findOne({ email }).select('password').lean();
-
+  // console.log(user._id, user.id);
   if (user) {
     const result = await bcrypt.compare(password, user.password);
     if (!result) { throw new ApiError(403, 'Incorrect email or password'); }
     // login
     const token = await jwt.sign({
       exp: Math.floor(Date.now() / 1000) + (60 * 60 * 8),
-      id: user.id,
+      id: user._id,
     }, process.env.JWT_PRIVATE_KEY);
     // console.log('token', token);
     const resposne = new ApiResponse(

@@ -36,33 +36,26 @@ const loginUser = asyncHandler(async (req, res, next) => {
   const {
     email, password,
   } = req.body;
-  try {
-    const response = await userService.loginUser(email, password);
-    // const token = response.data.token;
-    // delete response.data.token;
-    // console.log(response);
-    return res
-      // .cookie('token', token, {
-      //   httpOnly: true,
-      //   secure: true, // Set to true in production (HTTPS only)
-      //   sameSite: 'strict', // Or 'none' if you need cross-site cookies
-      // })
-      .json(response);
-  } catch (error) {
-    next(error);
-  }
+  const response = await userService.loginUser(email, password);
+  // const token = response.data.token;
+  // delete response.data.token;
+  // console.log(response);
+  return res
+    // .cookie('token', token, {
+    //   httpOnly: true,
+    //   secure: true, // Set to true in production (HTTPS only)
+    //   sameSite: 'strict', // Or 'none' if you need cross-site cookies
+    // })
+    .json(response);
 });
 
 const getUsers = asyncHandler(async (req, res, next) => {
   const {
     query,
   } = req.query;
-  try {
-    const response = await userService.getUsers(query);
-    return res.json(response);
-  } catch (error) {
-    next(error);
-  }
+
+  const response = await userService.getUsers(query);
+  return res.json(response);
 });
 
 module.exports = {

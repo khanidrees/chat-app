@@ -7,6 +7,7 @@ const cors = require('cors');
 const { connectToDatabase } = require('./db/connect');
 
 const userRouter = require('./components/auth/userRouter');
+const chatRouter = require('./components/chat/chatRouter');
 const { ApiError } = require('./utils/ApiError');
 
 const app = express();
@@ -43,6 +44,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use('/api/v1/users', userRouter);
+
+app.use('/api/v1/chat', chatRouter);
 
 app.use('/', (req, res) => res.json({ hi: 'from server' }));
 
