@@ -3,14 +3,21 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const { isHttpError } = require('http-errors');
 const cors = require('cors');
+const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
+const { createServer } = require('http');
 
 const { connectToDatabase } = require('./db/connect');
 
 const userRouter = require('./components/auth/userRouter');
 const chatRouter = require('./components/chat/chatRouter');
 const { ApiError } = require('./utils/ApiError');
+const User = require('./components/auth/userModel');
+const { default: mongoose } = require('mongoose');
 
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {});
 
 connectToDatabase();
 
@@ -47,20 +54,51 @@ app.use('/api/v1/users', userRouter);
 
 app.use('/api/v1/chat', chatRouter);
 
-app.use('/', (req, res) => res.json({ hi: 'from server' }));
+// app.use('/', (req, res) => res.json({ hi: 'from server' }));
 
-app.use((err, req, res, next) => {
-  let statusCode = 500;
-  let errorMessage = 'Something broke!';
-  console.log('err', JSON.stringify(err));
-  if (isHttpError(err)) {
-    statusCode = err.statusCode;
-    errorMessage = err.message;
+io.on('connection', async (socket) => {
+  const { token } = socket.handshake.auth;
+  if (!token) {
+    throw new ApiError(401, 'No Access Token');
   }
-  return res.status(statusCode).json(new ApiError(
-    statusCode,
-    errorMessage,
-  ));
+  const decodedToken = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
+
+  const user = await User.findById(decodedToken?.id).select('-password -refreshToken');
+
+  if (!user) {
+    throw new ApiError(401, 'Invalid Access Token');
+  }
+  socket.user = user;
+
+  console.log('User Connected: ', user.username);
+
+  // create a room and join user to it
+  socket.join(user._id);
+
+  socket.on('disconnect', () => {
+    socket.leave(user._id);
+  });
 });
 
-module.exports = app;
+app.use((err, req, res, next) => {
+  let error = err;
+  console.log('err', JSON.stringify(err));
+  if (!(err instanceof ApiError)) {
+    const statusCode = error.statusCode || error instanceof mongoose.Error ? 400 : 500;
+
+    // set a message from native Error instance or a custom one
+    const message = error.message || 'Something went wrong';
+    error = new ApiError(statusCode, message, error?.errors || [], err.stack);
+  }
+
+  // Now we are sure that the `error` variable will be an instance of ApiError class
+  const response = {
+    ...error,
+    message: error.message,
+    // ...(process.env.NODE_ENV === "development" ? { stack: error.stack } : {}),
+  };
+  // Send error response
+  return res.status(error.statusCode).json(response);
+});
+
+module.exports = httpServer;

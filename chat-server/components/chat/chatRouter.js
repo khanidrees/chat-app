@@ -1,25 +1,19 @@
 const express = require('express');
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 const { isAuthorized } = require('../auth/auth');
-const { createChat, createMessage } = require('./chatController');
+const { createOrGetChat, sendMessage } = require('./chatController');
 
 const router = express.Router();
 
 router.post(
-  '/',
+  '/:recieverId',
   [
-    body('name')
-      .isLength({ min: 2, max: 20 })
-      .withMessage('Please Enter Valid Name'),
-    body('participants', 'Enter 8 char of alphanumeric type onnly')
-      .isArray({ min: 2, max: 100 })
-      .withMessage('please provide atleast 2 participants'),
-    body('isGroupChat')
-      .isBoolean()
-      .withMessage('Please provide valid isGroupChat value'),
+    param('recieverId')
+      .notEmpty().isMongoId()
+      .withMessage('Invalid reciever'),
   ],
   isAuthorized,
-  createChat,
+  createOrGetChat,
 );
 
 router.post(
@@ -30,7 +24,7 @@ router.post(
       .withMessage('Please Enter Valid Name'),
   ],
   isAuthorized,
-  createMessage,
+  sendMessage,
 );
 
 module.exports = router;
