@@ -1,13 +1,13 @@
-const { Types } = require("mongoose");
-const { ApiError } = require("../../utils/ApiError");
+const { Types } = require('mongoose');
+const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
-const User = require("../auth/userModel");
-const Chat = require("./chatModel");
-const Message = require("./messageModel");
+const User = require('../auth/userModel');
+const Chat = require('./chatModel');
+const Message = require('./messageModel');
 
 const createChat = async (
   recieverId,
-  userId
+  userId,
 ) => {
   // check if reciever exists
   const reciever = await User.find({ _id: recieverId });

@@ -1,11 +1,11 @@
-export type User = {
+export interface User  {
     fullname: string;
     username: string;
     email: string;
     password: string;
     confirmPassword: string;
 };
-export type UserCredentials = {
+export interface UserCredentials {
     email: string,
     password: string,
 }

@@ -19,9 +19,14 @@ const formSchema = z.object({
 });
 import { loginUser, postUser } from "@/apis";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "@/Contexts/AuthContext";
 
 const Login = () => {
     const navigate = useNavigate(); 
+    const { loading , token , setToken  } = useAuth();
+    if(token){
+        navigate('/');
+    }
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -39,6 +44,7 @@ const Login = () => {
             const response = await loginUser(values);
             if(response.status ==200 && response.data.data.token){
                 localStorage.setItem('token',response.data.data.token);
+                setToken(response.data.data.token);
                 navigate("/");
             }
         }catch(err){

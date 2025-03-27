@@ -26,9 +26,14 @@ const formSchema = z.object({
   });
 import { postUser } from "@/apis";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "@/Contexts/AuthContext";
 
 const Signup = () => {
     const navigate = useNavigate(); 
+    const { loading , token , setToken  } = useAuth();
+        if(token){
+            navigate('/');
+        }
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {

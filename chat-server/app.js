@@ -18,7 +18,7 @@ const { default: mongoose } = require('mongoose');
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {});
-
+app.set('io', io);
 connectToDatabase();
 
 // for security
@@ -82,7 +82,7 @@ io.on('connection', async (socket) => {
 
 app.use((err, req, res, next) => {
   let error = err;
-  console.log('err', JSON.stringify(err));
+  console.log(err);
   if (!(err instanceof ApiError)) {
     const statusCode = error.statusCode || error instanceof mongoose.Error ? 400 : 500;
 
@@ -90,7 +90,7 @@ app.use((err, req, res, next) => {
     const message = error.message || 'Something went wrong';
     error = new ApiError(statusCode, message, error?.errors || [], err.stack);
   }
-
+  console.log('err', JSON.stringify(error));
   // Now we are sure that the `error` variable will be an instance of ApiError class
   const response = {
     ...error,

@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext(undefined);
 
@@ -11,7 +11,11 @@ export const AuthProvider = ({children})=>{
     setToken(storedToken);
     setLoading(false); 
   }, []);
-    return <AuthContext.Provider value={{loading, token, setToken}}>
+    return <AuthContext.Provider value ={{loading, token, setToken}}>
     {children}
     </AuthContext.Provider>
+}
+
+export const useAuth = () =>{
+  return useContext(AuthContext);
 }

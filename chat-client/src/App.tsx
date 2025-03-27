@@ -1,29 +1,31 @@
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Login from './components/Login'
-import Signup from './components/Signup'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
 import Home from './components/Home'
 import { AuthProvider } from './Contexts/AuthContext'
+import Layout from './components/Layout'
+import SearchPage from './pages/SearchPage'
+import ProtectedRoute from './components/ProtectedRoute'
+import ChatPage from './pages/ChatPage'
 
 function App() {
 
   return (
-  <div className='flex justify-center'>  
+  <div >  
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route
-          path='/'
-          element={<Home/>}
-          />
-          <Route
-          path='/login'
-          element={<Login/>}
-          />
-          <Route
-          path='/signup'
-          element={<Signup/>}
-          />
+          
+          <Route element={<ProtectedRoute/>} >
+            <Route path='/' element={<Layout/>}
+            >
+              <Route index element={<SearchPage/>}/>
+              <Route path='/chats/:userId' element={<ChatPage/>}/>
+            </Route>
+          </Route>
+          <Route path='/login' element={<Login/>}/>
+          <Route path='/signup' element={<Signup/>}/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
