@@ -42,6 +42,15 @@ const createChat = async (
         ],
       },
     },
+    // we will create api to get all messages
+    // {
+    //   $lookup: {
+    //     from: 'messages',
+    //     localField: '_id',
+    //     foreignField: 'chat',
+    //     as: 'messages',
+    //   },
+    // },
   ]);
 
   if (chats.length) {
@@ -67,7 +76,7 @@ const createMessage = async (
   const message = await Message.create({
     sender: userId,
     content,
-    chatId,
+    chat: chatId,
   });
   if (message) {
     return new ApiResponse(201, message, 'message created successfully');
@@ -75,7 +84,48 @@ const createMessage = async (
   throw new ApiError(500, 'Error While creating message');
 };
 
+const getMessages = async (chatId) => {
+  const chat = await Chat.findById(chatId);
+  if (!chat) {
+    throw new ApiError(404, 'reciever not found');
+  }
+  const messages = await Message.aggregate([
+    {
+      $match: {
+        _id: chat._id,
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'sender',
+        foreignField: '_id',
+        as: 'sender',
+        pipeline: [
+          {
+            $project: {
+              username: 1,
+              fullname: 1,
+              email: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+  ]);
+  if (messages) {
+    return new ApiResponse(201, messages, 'message recieved successfully');
+  }
+  throw new ApiError(500, 'Error While recieving message');
+};
+
 module.exports = {
   createChat,
   createMessage,
+  getMessages,
 };

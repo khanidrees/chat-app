@@ -14,6 +14,7 @@ const messageSchema = new Schema(
     chat: {
       type: Types.ObjectId,
       ref: 'Chat',
+      required: true,
     },
   },
   {

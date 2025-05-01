@@ -10,6 +10,7 @@ module.exports.isAuthorized = async (req, res, next) => {
     if (!authorization) {
       throw new ApiError(401, 'Unauthorized request');
     }
+    console.log(authorization);
     const decodedToken = jwt.verify(authorization, process.env.JWT_PRIVATE_KEY);
 
     console.log(decodedToken);

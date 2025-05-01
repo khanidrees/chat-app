@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, param } = require('express-validator');
 const { isAuthorized } = require('../auth/auth');
-const { createOrGetChat, sendMessage } = require('./chatController');
+const { createOrGetChat, sendMessage, getMessages } = require('./chatController');
 
 const router = express.Router();
 
@@ -25,6 +25,12 @@ router.post(
   ],
   isAuthorized,
   sendMessage,
+);
+
+router.get(
+  '/:chatId/message',
+  isAuthorized,
+  getMessages,
 );
 
 module.exports = router;

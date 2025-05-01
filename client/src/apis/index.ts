@@ -1,6 +1,6 @@
 import { User, UserCredentials } from '@/types/user';
 import axios from 'axios';
-import { axiosInstance } from './axios';
+import  axiosInstance  from './axios';
 const BE_URL =  import.meta.env.VITE_BE_URL;
 console.log(BE_URL);
 

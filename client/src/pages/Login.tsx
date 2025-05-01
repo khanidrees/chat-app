@@ -20,13 +20,14 @@ const formSchema = z.object({
 import { loginUser, postUser } from "@/apis";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/Contexts/AuthContext";
+import { useEffect } from "react";
 
 const Login = () => {
     const navigate = useNavigate(); 
     const { loading , token , setToken  } = useAuth();
-    if(token){
-        navigate('/');
-    }
+    useEffect(()=>{
+        if(token) navigate('/');
+    },[])
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
