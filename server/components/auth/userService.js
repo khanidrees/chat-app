@@ -31,7 +31,7 @@ const postUser = async (username, fullname, email, mobileNumber, password) => {
 };
 
 const loginUser = async (email, password) => {
-  const user = await User.findOne({ email }).select('password').lean();
+  const user = await User.findOne({ email }).select('password fullname username').lean();
   // console.log(user._id, user.id);
   if (user) {
     const result = await bcrypt.compare(password, user.password);
@@ -47,6 +47,11 @@ const loginUser = async (email, password) => {
       {
         loggedIn: true,
         token,
+        user: {
+          id: user._id,
+          fullname: user.fullname,
+          username: user.username,
+        },
       },
       'Logged In Successfully',
     );
@@ -55,11 +60,11 @@ const loginUser = async (email, password) => {
   throw new ApiError(402, 'Incorrect email or password');
 };
 
-const getUsers = async (query) => {
+const getUsers = async (query, userId) => {
   if (query === '') return [];
   const users = await User.find({ $text: { $search: query } });
-
-  return new ApiResponse(200, users, 'Users Retrieved');
+  const allUsers = users.filter((user) => user.id !== userId);
+  return new ApiResponse(200, allUsers, 'Users Retrieved');
 };
 module.exports = {
   postUser,

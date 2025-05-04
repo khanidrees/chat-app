@@ -14,7 +14,7 @@ module.exports.isAuthorized = async (req, res, next) => {
     const decodedToken = jwt.verify(authorization, process.env.JWT_PRIVATE_KEY);
 
     console.log(decodedToken);
-    const user = await User.findById(decodedToken?.id).select('-password -refreshToken');
+    const user = await User.findById(decodedToken?.id).select('-password');
 
     if (!user) {
       throw new ApiError(401, 'Invalid Access Token');

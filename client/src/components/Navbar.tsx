@@ -2,10 +2,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import { Button } from "./ui/button"
 import { MessageSquare, Search, User, Users, LogOut  } from "lucide-react"
 
+import {  useAuth } from "@/Contexts/AuthContext";
+
 export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-
+  const { loading, token, setToken, user, setUser } = useAuth();
   const navItems = [
     {
       name: "Search",
@@ -36,6 +38,8 @@ export function Navbar() {
   }
   function logoutHandler(){
     localStorage.setItem('token', '');
+    setToken(null);
+    setUser(null);
     navigate('/login')
   }
 

@@ -44,7 +44,7 @@ const sendMessage = asyncHandler(async (req, res, next) => {
   const {
     content,
   } = req.body;
-  const userId = req.user._id;
+  const userId = req.user._id.toString();
   const { chatId } = req.params;
   const resposne = await chatService.createMessage(
     userId,
@@ -53,7 +53,14 @@ const sendMessage = asyncHandler(async (req, res, next) => {
   );
 
   // TODO: emit message event to all participants
+  const participants = resposne.data.chat.participants;
 
+  participants.forEach((p) => {
+    if (p.toString() === userId) return;
+    console.log('message on ws to '+ p +'-' +userId);
+    emitSocketEvent(req, p.toString(), 'MESSAGE', JSON.stringify(resposne.data));
+  });
+  delete resposne?.data?.chat;
   if (resposne) {
     res.status(201).json(resposne);
   }
@@ -64,7 +71,6 @@ const getMessages = asyncHandler(async (req, res, next) => {
   const resposne = await chatService.getMessages(
     chatId,
   );
-
 
   if (resposne) {
     res.status(201).json(resposne);

@@ -17,7 +17,11 @@ const { default: mongoose } = require('mongoose');
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, {});
+const io = new Server(httpServer, {
+  cors: {
+    origin: 'http://localhost:5173',
+  },
+});
 app.set('io', io);
 connectToDatabase();
 
@@ -57,27 +61,38 @@ app.use('/api/v1/chat', chatRouter);
 // app.use('/', (req, res) => res.json({ hi: 'from server' }));
 
 io.on('connection', async (socket) => {
-  const { token } = socket.handshake.auth;
-  if (!token) {
-    throw new ApiError(401, 'No Access Token');
+  try{
+    const { token } = socket.handshake.auth;
+    if (!token) {
+      throw new ApiError(401, 'No Access Token');
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
+
+    const user = await User.findById(decodedToken?.id).select('-password -refreshToken');
+
+    if (!user) {
+      throw new ApiError(401, 'Invalid Access Token');
+    }
+    socket.user = user;
+
+    socket.onAnyOutgoing((eventName, ...args) => {
+      console.log(eventName);
+      console.log(args);
+    });
+
+    console.log('User Connected: ', user.username);
+
+    // create a room and join user to it
+    socket.join(user._id.toString());
+
+    socket.on('disconnect', () => {
+      if (socket.user?._id) {
+        socket.leave(socket.user._id.toString());
+      }
+    });
+  } catch (e) {
+    console.log('Error while connecting to ws' + e);
   }
-  const decodedToken = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
-
-  const user = await User.findById(decodedToken?.id).select('-password -refreshToken');
-
-  if (!user) {
-    throw new ApiError(401, 'Invalid Access Token');
-  }
-  socket.user = user;
-
-  console.log('User Connected: ', user.username);
-
-  // create a room and join user to it
-  socket.join(user._id);
-
-  socket.on('disconnect', () => {
-    socket.leave(user._id);
-  });
 });
 
 app.use((err, req, res, next) => {

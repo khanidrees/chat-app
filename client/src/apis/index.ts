@@ -17,6 +17,7 @@ export const postUser = async (user:User)=>{
 export const loginUser = async (user: UserCredentials)=>{
     try{
         const response = await axios.post(BE_URL+"/api/v1/users/login",user);
+        console.log(response);
         return response;
     }catch(error){
         console.error('Error while Login user:', error);
@@ -36,4 +37,24 @@ export const  createOrgetChatApi = async (userId: string)=>{
     
     return await axiosInstance.post(url);
      
+}
+
+export const getChatMessages = async (chatId:string)=>{
+    try{
+        const response = await axiosInstance.get(BE_URL+"/api/v1/chat/"+chatId+"/message");
+        return response;
+    }catch(error){
+        console.error('Error while fetching message:', error);
+        throw error;
+    }
+}
+
+export const postChatMessage = async (content:string,chatId:string)=>{
+    try{
+        const response = await axiosInstance.post(BE_URL+"/api/v1/chat/"+chatId+"/message",{content});
+        return response;
+    }catch(error){
+        console.error('Error while sending message:', error);
+        throw error;
+    }
 }

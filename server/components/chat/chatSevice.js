@@ -73,12 +73,30 @@ const createMessage = async (
   content,
   chatId,
 ) => {
+  const chat = await Chat.findOne(
+    {
+      $and: [
+        {
+          _id: chatId,
+        },
+        {
+          participants: {
+            $in: [userId],
+          },
+        },
+      ],
+    },
+  );
+  if (!chat) {
+    throw new ApiError(404, 'chat not found');
+  }
   const message = await Message.create({
     sender: userId,
     content,
     chat: chatId,
   });
   if (message) {
+    message.chat = chat;
     return new ApiResponse(201, message, 'message created successfully');
   }
   throw new ApiError(500, 'Error While creating message');
@@ -92,32 +110,34 @@ const getMessages = async (chatId) => {
   const messages = await Message.aggregate([
     {
       $match: {
-        _id: chat._id,
+        chat: chat._id,
       },
     },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'sender',
-        foreignField: '_id',
-        as: 'sender',
-        pipeline: [
-          {
-            $project: {
-              username: 1,
-              fullname: 1,
-              email: 1,
-            },
-          },
-        ],
-      },
-    },
-    {
-      $sort: {
-        createdAt: -1,
-      },
-    },
+    // {
+    //   $lookup: {
+    //     from: 'users',
+    //     localField: 'sender',
+    //     foreignField: '_id',
+    //     as: 'sender',
+    //     pipeline: [
+    //       {
+    //         $project: {
+    //           username: 1,
+    //           fullname: 1,
+    //           email: 1,
+    //         },
+    //       },
+    //     ],
+    //   },
+    // },
+    // {
+    //   $sort: {
+    //     createdAt: -1,
+    //   },
+    // },
   ]);
+  // console.log('first')
+  // console.log(messages)
   if (messages) {
     return new ApiResponse(201, messages, 'message recieved successfully');
   }

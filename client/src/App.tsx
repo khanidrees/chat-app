@@ -21,7 +21,7 @@ function App() {
             <Route path='/' element={<Layout/>}
             >
               <Route index element={<SearchPage/>}/>
-              <Route path='/chats/:userId' element={<ChatPage/>}/>
+              <Route path='/chats/:recieverId/:chatId' element={<ChatPage/>}/>
             </Route>
           </Route>
           <Route path='/login' element={<Login/>}/>

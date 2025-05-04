@@ -54,7 +54,7 @@ const getUsers = asyncHandler(async (req, res, next) => {
     query,
   } = req.query;
 
-  const response = await userService.getUsers(query);
+  const response = await userService.getUsers(query, req.user._id.toString());
   return res.json(response);
 });
 

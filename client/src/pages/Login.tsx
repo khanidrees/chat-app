@@ -24,7 +24,7 @@ import { useEffect } from "react";
 
 const Login = () => {
     const navigate = useNavigate(); 
-    const { loading , token , setToken  } = useAuth();
+    const { loading, token, setToken,user,setUser  } = useAuth();
     useEffect(()=>{
         if(token) navigate('/');
     },[])
@@ -45,7 +45,9 @@ const Login = () => {
             const response = await loginUser(values);
             if(response.status ==200 && response.data.data.token){
                 localStorage.setItem('token',response.data.data.token);
+                localStorage.setItem('user',JSON.stringify(response.data.data.user));
                 setToken(response.data.data.token);
+                setUser(response.data.data.user);
                 navigate("/");
             }
         }catch(err){
