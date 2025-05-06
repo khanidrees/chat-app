@@ -8,26 +8,31 @@ import Layout from './components/Layout'
 import SearchPage from './pages/SearchPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import ChatPage from './pages/ChatPage'
+import AllChatsPage from './pages/AllChatsPage'
+import { ChatProvider } from './Contexts/ChatContext'
 
 function App() {
 
   return (
   <div >  
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          
-          <Route element={<ProtectedRoute/>} >
-            <Route path='/' element={<Layout/>}
-            >
-              <Route index element={<SearchPage/>}/>
-              <Route path='/chats/:recieverId/:chatId' element={<ChatPage/>}/>
+      <ChatProvider>
+        <BrowserRouter>
+          <Routes>
+            
+            <Route element={<ProtectedRoute/>} >
+              <Route path='/' element={<Layout/>}
+              >
+                <Route index element={<SearchPage/>}/>
+                <Route path='chats' element={<AllChatsPage/>}/>
+                <Route path='/chats/:recieverId/:chatId' element={<ChatPage/>}/>
+              </Route>
             </Route>
-          </Route>
-          <Route path='/login' element={<Login/>}/>
-          <Route path='/signup' element={<Signup/>}/>
-        </Routes>
-      </BrowserRouter>
+            <Route path='/login' element={<Login/>}/>
+            <Route path='/signup' element={<Signup/>}/>
+          </Routes>
+        </BrowserRouter>
+      </ChatProvider>
     </AuthProvider>
   </div>
   )

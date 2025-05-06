@@ -14,6 +14,7 @@ const chatRouter = require('./components/chat/chatRouter');
 const { ApiError } = require('./utils/ApiError');
 const User = require('./components/auth/userModel');
 const { default: mongoose } = require('mongoose');
+const Message = require('./components/chat/messageModel');
 
 const app = express();
 const httpServer = createServer(app);
@@ -84,6 +85,28 @@ io.on('connection', async (socket) => {
 
     // create a room and join user to it
     socket.join(user._id.toString());
+
+    socket.on('MESSAGES_READ', async (payload) => {
+      const { messageIds, sender } = JSON.parse(payload);
+      console.log(' s ' +sender);
+      try {
+        if (!Array.isArray(messageIds) || messageIds.length === 0) {
+          console.log('Invalid messageIds:', messageIds);
+          return;
+        }
+        const updateResult = await Message.updateMany(
+          { _id: { $in: messageIds } },
+          { $set: { isRead: true } },
+        );
+        console.log(`Updated ${updateResult.modifiedCount} messages as read`);
+        console.log(updateResult);
+
+        //  emit an event to the sender to confirm the update
+        io.to(sender).emit('MESSAGES_READ_CONFIRMATION', messageIds);
+      } catch (error) {
+        console.error('Error marking messages as read:', error);
+      }
+    });
 
     socket.on('disconnect', () => {
       if (socket.user?._id) {

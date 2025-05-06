@@ -58,3 +58,13 @@ export const postChatMessage = async (content:string,chatId:string)=>{
         throw error;
     }
 }
+
+export const getAllChats = async ()=>{
+    try{
+        const response = await axiosInstance.get(BE_URL+"/api/v1/chat/");
+        return response;
+    }catch(error){
+        console.error('Error while getting all chats:', error);
+        throw error;
+    }
+}

@@ -38,7 +38,7 @@ const loginUser = async (email, password) => {
     if (!result) { throw new ApiError(403, 'Incorrect email or password'); }
     // login
     const token = await jwt.sign({
-      exp: Math.floor(Date.now() / 1000) + (60 * 60 * 8),
+      exp: Math.floor(Date.now() / 1000) + (60 * 60 * 8), //  seconds
       id: user._id,
     }, process.env.JWT_PRIVATE_KEY);
     // console.log('token', token);

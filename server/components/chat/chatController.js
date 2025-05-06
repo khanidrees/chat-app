@@ -77,8 +77,20 @@ const getMessages = asyncHandler(async (req, res, next) => {
   }
 });
 
+const getAllChats = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id.toString();
+  const resposne = await chatService.getAllChats(
+    userId,
+  );
+
+  if (resposne) {
+    res.status(201).json(resposne);
+  }
+});
+
 module.exports = {
   createOrGetChat,
   sendMessage,
   getMessages,
+  getAllChats
 };

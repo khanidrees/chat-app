@@ -1,4 +1,4 @@
-const { Types } = require('mongoose');
+const { Types, Schema } = require('mongoose');
 const { ApiError } = require('../../utils/ApiError');
 const { ApiResponse } = require('../../utils/ApiResponse');
 const User = require('../auth/userModel');
@@ -95,6 +95,16 @@ const createMessage = async (
     content,
     chat: chatId,
   });
+
+  const updatedChat = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $set: {
+        lastMessage: message._id,
+      },
+    },
+    { new: true },
+  );
   if (message) {
     message.chat = chat;
     return new ApiResponse(201, message, 'message created successfully');
@@ -139,13 +149,75 @@ const getMessages = async (chatId) => {
   // console.log('first')
   // console.log(messages)
   if (messages) {
-    return new ApiResponse(201, messages, 'message recieved successfully');
+    return new ApiResponse(200, messages, 'message recieved successfully');
   }
   throw new ApiError(500, 'Error While recieving message');
+};
+
+const getAllChats = async (userId) => {
+  const user = await User.find({ _id: userId });
+  if (!user) {
+    throw new ApiError(404, 'user not found');
+  }
+  const chats = await Chat.aggregate([
+    {
+      $match: {
+        isGroupChat: false,
+        participants: {
+          $elemMatch: {
+            $eq: new Types.ObjectId(userId),
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'messages',
+        localField: 'lastMessage',
+        foreignField: '_id',
+        as: 'lastMessage',
+        pipeline: [
+          {
+            $project: {
+              content: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'participants',
+        foreignField: '_id',
+        as: 'reciever',
+        pipeline: [
+          {
+            $match: {
+              _id: {
+                $ne: new Types.ObjectId(userId),
+              },
+            },
+          },
+          {
+            $project: {
+              fullname: 1,
+            },
+          },
+        ],
+      },
+    },
+  ]);
+
+  if (chats) {
+    return new ApiResponse(200, chats, 'chats recieved successfully');
+  }
+  throw new ApiError(500, 'Error While recieving chats');
 };
 
 module.exports = {
   createChat,
   createMessage,
   getMessages,
+  getAllChats
 };
