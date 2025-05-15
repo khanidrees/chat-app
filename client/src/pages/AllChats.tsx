@@ -6,11 +6,8 @@ import {  useState, useEffect } from "react";
 import { getAllChats } from "@/apis";
 import { useAuth } from "@/Contexts/AuthContext";
 
-export default function AllChatsPage() {
-  const [chats, setChats] = useState([]);
-  const { loading, token, setToken,user,setUser } = useAuth();
-   
-
+export default function AllChats({selectChat, chats, setChats, currChatId}) {
+  
   useEffect(()=>{
     async function getChats() {
       try{
@@ -23,6 +20,8 @@ export default function AllChatsPage() {
     }
     getChats();
   },[])
+
+  
   // Mock data for recent chats
   // const recentChats = [
   //   {
@@ -49,13 +48,15 @@ export default function AllChatsPage() {
   // ]
 
   return (
-    <div className="container py-6 max-w-4xl mx-auto">
+    <div className=" py-6  min-w-xs mx-auto">
       <h1 className="text-3xl font-bold mb-6">Your Chats</h1>
 
       <div className="space-y-4">
         {chats.map((chat) => (
-          <Link key={chat._id} to={`/chats/${chat.reciever[0]?._id}/${chat._id}`}>
-            <Card className="hover:bg-accent/50 transition-colors">
+            <Card 
+            key={chat._id}
+            onClick={()=>selectChat(chat._id, chat.reciever[0]?._id)}
+            className={"hover:bg-accent/50 hover:bg-blue-100 transition-colors py-0 "+ (chat._id.toString()===currChatId ? "bg-blue-300": '')}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   <Avatar>
@@ -64,18 +65,19 @@ export default function AllChatsPage() {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline">
-                      <h3 className="font-medium truncate">{chat.name}</h3>
-                      <div
-                      className="rounded-full bg-green-800 w-8 h-8 text-white font-bold text-center"
-                      >{chat?.unreadMessages ||2}</div>
+                      <h3 className="font-medium truncate">{chat.reciever[0].fullname}</h3>
+                      { chat?.messages?.length != 0 && 
+                        <div
+                        className="rounded-full bg-green-800 w-8 h-8 text-white font-bold text-center"
+                        >{chat?.messages?.length}</div>
+                      }
                       <span className="text-xs text-muted-foreground">{getTimeHHMM(chat.updatedAt)}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground truncate justify-self-start">{chat.lastMessage[0].content}</p>
+                    <p className="text-sm text-muted-foreground truncate justify-self-start">{chat?.lastMessage?.[0]?.content}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </Link>
         ))}
       </div>
     </div>

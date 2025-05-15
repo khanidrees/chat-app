@@ -187,6 +187,42 @@ const getAllChats = async (userId) => {
     },
     {
       $lookup: {
+        from: 'messages',
+        localField: '_id',
+        foreignField: 'chat',
+        as: 'messages',
+        pipeline: [
+          {
+            $match: {
+              sender: {
+                $ne: new Types.ObjectId(userId),
+              },
+              $or: [{
+                isRead: false,
+              },
+              {
+                isRead: {
+                  $exists: false,
+                },
+              }],
+            },
+          },
+        ],
+      },
+    },
+    // {
+    //   $unwind: '$messages', // Deconstruct the 'messages' array
+    // },
+    // {
+    //   $addFields: {
+    //     unReadMessages: {
+    //       $size: '$messages',
+    //     },
+    //     // messages: '$$REMOVE',
+    //   },
+    // },
+    {
+      $lookup: {
         from: 'users',
         localField: 'participants',
         foreignField: '_id',

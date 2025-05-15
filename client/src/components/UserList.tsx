@@ -65,7 +65,7 @@ export function UserList({ users, loading, error, onAddUser, selectable = false,
         const response = await createOrgetChatApi(userId);
         console.log(response);
         if(response.data.statusCode== 200 || response.data.statusCode== 201){
-          navigate('/chats/'+userId+ '/'+response.data.data._id.toString());
+          navigate('/chats');
         }
       }catch(e){
         // TODO

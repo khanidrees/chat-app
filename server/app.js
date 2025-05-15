@@ -103,6 +103,7 @@ io.on('connection', async (socket) => {
 
         //  emit an event to the sender to confirm the update
         io.to(sender).emit('MESSAGES_READ_CONFIRMATION', messageIds);
+        console.log(messageIds);
       } catch (error) {
         console.error('Error marking messages as read:', error);
       }

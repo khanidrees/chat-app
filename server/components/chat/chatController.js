@@ -58,7 +58,7 @@ const sendMessage = asyncHandler(async (req, res, next) => {
   participants.forEach((p) => {
     if (p.toString() === userId) return;
     console.log('message on ws to '+ p +'-' +userId);
-    emitSocketEvent(req, p.toString(), 'MESSAGE', JSON.stringify(resposne.data));
+    emitSocketEvent(req, p.toString(), 'MESSAGE_RECIEVED', JSON.stringify(resposne.data));
   });
   delete resposne?.data?.chat;
   if (resposne) {
